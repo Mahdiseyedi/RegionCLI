@@ -5,6 +5,7 @@ import (
 	"RegionCLI/Models/Representatives"
 	"bufio"
 	"encoding/json"
+	"log"
 	"os"
 	"time"
 )
@@ -55,4 +56,29 @@ func GetRepresentatives() (map[int]Representatives.Representative, error) {
 		representatives[r.Id] = r
 	}
 	return representatives, nil
+}
+
+func GetRepresentativeByID(id int) (Representatives.Representative, error) {
+	var err error
+	f, oErr := os.OpenFile(Representatives.RepresentativeFilePath, os.O_APPEND|os.O_CREATE, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		var representative Representatives.Representative
+		err := json.Unmarshal([]byte(line), &representative)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if representative.Id == id {
+			return representative, err
+		}
+	}
+
+	return Representatives.Representative{-1, "", "", "", 0, 0, time.Now()}, err
 }

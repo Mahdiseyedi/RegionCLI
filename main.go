@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	rt2, _ := RepresentativeRepository.GetRepresentatives()
-	fmt.Println(rt2[1].Name)
+	rt2, _ := RepresentativeRepository.GetRepresentativeByID(0)
+	fmt.Println(rt2)
 }
