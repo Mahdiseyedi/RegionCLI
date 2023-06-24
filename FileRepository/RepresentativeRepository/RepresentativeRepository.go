@@ -1,8 +1,9 @@
-package RegionRepository
+package RepresentativeRepository
 
 import (
 	"RegionCLI/Models"
 	"RegionCLI/Models/Representatives"
+	"bufio"
 	"encoding/json"
 	"os"
 	"time"
@@ -31,4 +32,27 @@ func CreateRepresentative(name, address, phoneNumber string, employeeCount, regi
 		err = eErr
 	}
 	return r.Id, err
+}
+
+func GetRepresentatives() (map[int]Representatives.Representative, error) {
+
+	var err error
+	f, oErr := os.OpenFile(Representatives.RepresentativeFilePath, os.O_APPEND|os.O_CREATE, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	representatives := make(map[int]Representatives.Representative)
+	for scanner.Scan() {
+		data := scanner.Bytes()
+		var r Representatives.Representative
+		err = json.Unmarshal(data, &r)
+		if err != nil {
+			return nil, err
+		}
+		representatives[r.Id] = r
+	}
+	return representatives, nil
 }
