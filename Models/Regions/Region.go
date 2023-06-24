@@ -1,7 +1,7 @@
-package Models
+package Regions
 
 import (
-	"bufio"
+	"RegionCLI/Models"
 	"encoding/json"
 	"os"
 )
@@ -15,9 +15,9 @@ type region struct {
 	Name string `json:"Name"`
 }
 
-func CreateRegion(regionName string) (region, error) {
+func CreateRegion(regionName string) (int, error) {
 	r := region{
-		Id:   CountLines() + 1,
+		Id:   Models.CountLines(regionFilePath) + 1,
 		Name: regionName,
 	}
 	var err error
@@ -32,24 +32,5 @@ func CreateRegion(regionName string) (region, error) {
 	if eErr != nil {
 		err = eErr
 	}
-	return r, err
-}
-
-func CountLines() int {
-	f, err := os.Open(regionFilePath)
-	if err != nil {
-		return 0
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	var count int
-	for scanner.Scan() {
-		count++
-	}
-	if err := scanner.Err(); err != nil {
-		return 0
-	}
-
-	return count
+	return r.Id, err
 }

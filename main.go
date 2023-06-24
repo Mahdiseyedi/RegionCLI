@@ -1,7 +1,7 @@
 package main
 
 import (
-	"RegionCLI/Models"
+	"RegionCLI/Models/Representatives"
 	"fmt"
 	"time"
 )
@@ -16,12 +16,7 @@ type Representative struct {
 	CreatedDate   time.Time `json:"CreatedDate"`
 }
 
-type Person struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
-}
-
 func main() {
-	r1, err := Models.CreateRegion("Shiraz")
+	r1, err := Representatives.CreateRepresentative("Mahdi", "Tehran-Mirza", "091233", 6, 1)
 	fmt.Println(r1, err)
 }
