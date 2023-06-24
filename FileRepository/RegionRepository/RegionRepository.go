@@ -119,3 +119,50 @@ func EditRegion(id int, newName string) error {
 	}
 	return err
 }
+
+func DeleteRegion(id int) (int, error) {
+	var updatedRegions []Regions.Region
+	var err error
+
+	if _, sErr := os.Stat(RegionFilePath); os.IsNotExist(err) {
+		err = sErr
+		return -1, err
+	}
+
+	f, oErr := os.OpenFile(RegionFilePath, os.O_RDONLY, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		var region Regions.Region
+		jErr := json.Unmarshal([]byte(line), &region)
+		if jErr != nil {
+			err = jErr
+			return -1, err
+		}
+		if region.Id != id {
+			updatedRegions = append(updatedRegions, region)
+		}
+	}
+
+	f2, oFerr := os.OpenFile(RegionFilePath, os.O_WRONLY|os.O_TRUNC, 0644)
+	if oFerr != nil {
+		err = oFerr
+		return -1, err
+	}
+	defer f2.Close()
+
+	for _, region := range updatedRegions {
+		newData, jMerr := json.Marshal(region)
+		if jMerr != nil {
+			return -1, jMerr
+		}
+		f2.WriteString(string(newData) + "\n")
+	}
+
+	return 0, err
+}

@@ -141,3 +141,49 @@ func EditRepresentative(id int, newName, newAddress, newPhoneNumber string, newE
 	}
 	return err
 }
+
+func DeleteRepresentative(id int) (int, error) {
+	var updatedRepresentatives []Representatives.Representative
+	var err error
+
+	if _, sErr := os.Stat(Representatives.RepresentativeFilePath); os.IsNotExist(err) {
+		err = sErr
+		return -1, err
+	}
+	f, oErr := os.OpenFile(Representatives.RepresentativeFilePath, os.O_RDONLY, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		var representative Representatives.Representative
+		jErr := json.Unmarshal([]byte(line), &representative)
+		if jErr != nil {
+			err = jErr
+			return -1, err
+		}
+		if representative.Id != id {
+			updatedRepresentatives = append(updatedRepresentatives, representative)
+		}
+	}
+
+	f2, oFerr := os.OpenFile(Representatives.RepresentativeFilePath, os.O_WRONLY|os.O_TRUNC, 0644)
+	if oFerr != nil {
+		err = oFerr
+		return -1, err
+	}
+	defer f2.Close()
+
+	for _, representative := range updatedRepresentatives {
+		newData, jMerr := json.Marshal(representative)
+		if jMerr != nil {
+			return -1, jMerr
+		}
+		f2.WriteString(string(newData) + "\n")
+	}
+
+	return 0, err
+}
