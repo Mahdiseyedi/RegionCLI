@@ -1,11 +1,12 @@
 package main
 
 import (
-	"RegionCLI/FileRepository/RegionRepository"
+	"RegionCLI/FileRepository/RepresentativeRepository"
 	"fmt"
 )
 
 func main() {
-	n, err := RegionRepository.DeleteRegion(5)
+	n, err := RepresentativeRepository.StatusRepresentative(3)
+	//n, err := RepresentativeRepository.GetRepresentatives()
 	fmt.Println(n, err)
 }

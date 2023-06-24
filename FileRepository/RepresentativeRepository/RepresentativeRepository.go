@@ -187,3 +187,15 @@ func DeleteRepresentative(id int) (int, error) {
 
 	return 0, err
 }
+
+func StatusRepresentative(regionId int) (int, error) {
+	CountOfEmployee := 0
+	listOfRepresentatives, err1 := GetRepresentatives()
+	for _, m := range listOfRepresentatives {
+		if regionId == m.RegionId {
+			CountOfEmployee += m.EmployeeCount
+		}
+	}
+
+	return CountOfEmployee, err1
+}
