@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	rt2, _ := RepresentativeRepository.GetRepresentativeByID(0)
-	fmt.Println(rt2)
+	err := RepresentativeRepository.EditRepresentative(1, "Ali", "", "0911123", 32, 5)
+	fmt.Println(err)
 }

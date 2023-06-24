@@ -82,3 +82,62 @@ func GetRepresentativeByID(id int) (Representatives.Representative, error) {
 
 	return Representatives.Representative{-1, "", "", "", 0, 0, time.Now()}, err
 }
+
+func EditRepresentative(id int, newName, newAddress, newPhoneNumber string, newEmployeeCount, newRegionId int) error {
+	var updatedRepresentatives []Representatives.Representative
+	var err error
+
+	f, oErr := os.OpenFile(Representatives.RepresentativeFilePath, os.O_APPEND|os.O_CREATE, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		var Representative Representatives.Representative
+		err := json.Unmarshal([]byte(line), &Representative)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if Representative.Id == id {
+			lastRepresentative, _ := GetRepresentativeByID(id)
+			if newName != "" {
+				Representative.Name = newName
+			} else {
+				Representative.Name = lastRepresentative.Name
+			}
+			if newAddress != "" {
+				Representative.Address = newAddress
+			} else {
+				Representative.Address = lastRepresentative.Address
+			}
+			if newPhoneNumber != "" {
+				Representative.PhoneNumber = newPhoneNumber
+			} else {
+				Representative.PhoneNumber = lastRepresentative.PhoneNumber
+			}
+			Representative.EmployeeCount = newEmployeeCount
+			Representative.RegionId = newRegionId
+
+			Representative.CreatedDate = lastRepresentative.CreatedDate
+		}
+		updatedRepresentatives = append(updatedRepresentatives, Representative)
+	}
+
+	f2, oErr := os.OpenFile(Representatives.RepresentativeFilePath, os.O_WRONLY|os.O_TRUNC, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f2.Close()
+
+	for _, Representative := range updatedRepresentatives {
+		newData, err := json.Marshal(Representative)
+		if err != nil {
+			log.Fatal(err)
+		}
+		f2.WriteString(string(newData) + "\n")
+	}
+	return err
+}

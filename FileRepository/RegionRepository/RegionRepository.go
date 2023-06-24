@@ -79,3 +79,43 @@ func GetRegionByID(id int) (Regions.Region, error) {
 
 	return Regions.Region{-1, ""}, err
 }
+
+func EditRegion(id int, newName string) error {
+	var updatedRegions []Regions.Region
+	var err error
+
+	f, oErr := os.OpenFile(RegionFilePath, os.O_APPEND|os.O_CREATE, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		var region Regions.Region
+		err := json.Unmarshal([]byte(line), &region)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if region.Id == id {
+			region.Name = newName
+		}
+		updatedRegions = append(updatedRegions, region)
+	}
+
+	f2, oErr := os.OpenFile(RegionFilePath, os.O_WRONLY|os.O_TRUNC, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f2.Close()
+
+	for _, region := range updatedRegions {
+		newData, err := json.Marshal(region)
+		if err != nil {
+			log.Fatal(err)
+		}
+		f2.WriteString(string(newData) + "\n")
+	}
+	return err
+}
