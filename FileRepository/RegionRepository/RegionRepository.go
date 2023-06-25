@@ -68,9 +68,9 @@ func GetRegionByID(id int) (Regions.Region, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		var region Regions.Region
-		err := json.Unmarshal([]byte(line), &region)
-		if err != nil {
-			log.Fatal(err)
+		jErr := json.Unmarshal([]byte(line), &region)
+		if jErr != nil {
+			err = jErr
 		}
 		if region.Id == id {
 			return region, err
@@ -78,6 +78,31 @@ func GetRegionByID(id int) (Regions.Region, error) {
 	}
 
 	return Regions.Region{-1, ""}, err
+}
+
+func GetRegionIdByName(regionName string) (int, error) {
+	var err error
+	f, oErr := os.OpenFile(RegionFilePath, os.O_RDONLY, 0644)
+	if oErr != nil {
+		err = oErr
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		var region Regions.Region
+		err := json.Unmarshal([]byte(line), &region)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if region.Name == regionName {
+			return region.Id, err
+		}
+	}
+
+	return -1, err
 }
 
 func EditRegion(id int, newName string) error {
