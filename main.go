@@ -6,7 +6,18 @@ import (
 )
 
 func main() {
-	n, err := RepresentativeRepository.StatusRepresentative(3)
-	//n, err := RepresentativeRepository.GetRepresentatives()
+	//for {
+	//	flag.Parse()
+	//	commands := flag.Args()
+	//	for i, c := range commands {
+	//		switch c {
+	//		case "Region":
+	//			fmt.Println(RegionRepository.GetRegions())
+	//		case "list":
+	//			fmt.Println()
+	//		}
+	//	}
+	//}
+	n, err := RepresentativeRepository.GetRepresentativesByRegionId(3)
 	fmt.Println(n, err)
 }

@@ -199,3 +199,15 @@ func StatusRepresentative(regionId int) (int, error) {
 
 	return CountOfEmployee, err1
 }
+
+func GetRepresentativesByRegionId(regionId int) (map[int]Representatives.Representative, error) {
+	representatives := make(map[int]Representatives.Representative)
+	listOfRepresentatives, err1 := GetRepresentatives()
+	for _, m := range listOfRepresentatives {
+		if regionId == m.RegionId {
+			representatives[m.Id] = m
+		}
+	}
+
+	return representatives, err1
+}
